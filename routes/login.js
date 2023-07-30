@@ -33,7 +33,7 @@ router.post("", (req, res) => {
             }
 
             const token = jwt.sign(
-                { password: user.password, email: user.email },
+                { password: user.password, email: user.email, isAdmin: user.isAdmin },
                 'your-secret-key', // Replace this with a long random string used for signing the token
                 { expiresIn: '1h' } // Token expires in 1 hour
             );
