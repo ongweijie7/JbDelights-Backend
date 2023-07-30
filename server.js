@@ -14,7 +14,12 @@ mongoose.connect(uri)
 
 
 
-
-var food = require('./routes/food-route');
-app.use('/food', food);
+var login = require('./routes/login');
+var localDelights = require('./routes/foodRoute');
+var fineDining = require('./routes/fineDiningRoute');
+var adventures = require('./routes/adventuresRoute');
+app.use('/login', login);
+app.use('/fineDining', fineDining);
+app.use('/food', localDelights);
+app.use('/adventures', adventures);
 app.listen(3000);
