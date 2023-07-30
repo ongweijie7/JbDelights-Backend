@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const foodPost = require("../model/foodPost");
-
+const submissions = require("../model/submissions");
 
 router.get("", (req, res) => { 
     //retrieve all food posts
@@ -31,10 +31,11 @@ router.get("/:id", (req, res) => {
 
 router.post("/create", (req, res) => {
     const parsedBody = req.body;
+    parsedBody.tag = "FOOD";
     console.log(parsedBody);
-    foodPost.create(parsedBody).then(result => res.send("successfully added!")).catch(error => res.send("missing field"));
-
-    
+    submissions.create(parsedBody)
+    .then(result => res.json({text: "successfully added!"}))
+    .catch(error => res.json({text: error}));
 })
 
 module.exports = router;
