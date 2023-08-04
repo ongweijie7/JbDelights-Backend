@@ -2,24 +2,22 @@ var jwt = require('jsonwebtoken');
 const express = require("express");
 const router = express.Router();
 const submissions = require("../model/submissions");
+const fineDining = require("../model/fineDining");
+const adventures = require("../model/adventures");
+const foodPost = require("../model/foodPost");
 
 const authAdmin = (req, res, next) => {
     try {
         const token = req.headers.authorisation.split(" ")[1];  // Get token from header
-        console.log(token);
         var decoded;
         try {
             decoded = jwt.verify(token, 'your-secret-key');
-            console.log(decoded);
         } catch (error) {
             console.log(error);
         }
-        
-        
         if (!decoded.isAdmin) {
             return res.status(403).json({ message: "Admin access denied" });
         }
-        console.log(decoded);
         req.user = decoded;
         next();
     } catch (error) {
@@ -41,7 +39,6 @@ router.get('/submissions', authAdmin, (req, res) => {
 router.get("/:id", (req, res) => {
     const fetchData = async (id) => {
         try {
-            console.log("Correct one");
             const document = await submissions.findById(id);
             return document;
         } catch (error) {
@@ -51,14 +48,37 @@ router.get("/:id", (req, res) => {
     fetchData(req.params.id).then(result => res.send(result));   
 })
 
-router.delete('/id', authAdmin, (req, res) => {
-    // Admin only data here...
-    
+/* Adds submissions to the relevant collections or rejects them*/
+router.post('/:id', authAdmin, (req, res) => {
+    const submission = req.body;
+    const { _id, ...withoutIdObject } = submission;
+    console.log(withoutIdObject);
+    let collection;
+    switch(submission.tag) {
+    case "FOOD":
+        collection = foodPost;
+        break;
+    case "FINE_DINING":
+        collection = fineDining;
+        break;
+    case "ADVENTURES":
+        collection = adventures;
+        break;
+    }
+
+    collection.create(withoutIdObject)
+    .then(result => res.json({text: "successfully added!"}))
+    .catch(error => res.json({text: error}));
 });
 
-router.post('/id', authAdmin, (req, res) => {
-    // Admin only data here...
-    
+router.delete('/:id', authAdmin, async (req, res) => {
+    console.log(req.params.id);
+    try {
+        const removedUser = await submissions.findByIdAndRemove(req.params.id) ;
+        res.json(removedUser);
+    } catch (err) {
+    res.status(400).json({ message: err });
+    }
 });
 
 

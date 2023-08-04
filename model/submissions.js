@@ -7,12 +7,12 @@ const submissionsSchema = new Schema({
         required: true
     },
     images: {
-        image1: {type: String, required: true},
-        image2: {type: String },
+        image1: { type: String, required: true },
+        image2: { type: String },
     },
     details: { 
-         openingHours : { type: String, required: true } ,
-         introduction : { type: String, required: true } ,
+         openingHours : { type: String, required: true },
+         introduction : { type: String, required: true },
     },
     hook: {
         type: String,

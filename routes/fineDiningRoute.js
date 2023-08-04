@@ -20,7 +20,6 @@ router.get("/:id", (req, res) => {
     const fetchData = async (id) => {
         try {
             const document = await fineDining.findById(id);
-            console.log(document);
             return document;
         } catch (error) {
             console.log(error);
@@ -33,7 +32,6 @@ router.get("/:id", (req, res) => {
 router.post("/create", (req, res) => {
     const parsedBody = req.body;
     parsedBody.tag = "FINE_DINING";
-    console.log(parsedBody);
     submissions.create(parsedBody)
     .then(result => res.json({text: "successfully added!"}))
     .catch(error => res.json({text: error}));
