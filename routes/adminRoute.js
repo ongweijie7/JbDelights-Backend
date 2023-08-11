@@ -52,7 +52,7 @@ router.get("/:id", (req, res) => {
 router.post('/:id', authAdmin, (req, res) => {
     const submission = req.body;
     const { _id, ...withoutIdObject } = submission;
-    console.log(withoutIdObject);
+
     let collection;
     switch(submission.tag) {
     case "FOOD":
