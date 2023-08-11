@@ -26,7 +26,7 @@ router.get("", (req, res) => {
     //retrieve all food posts
     foodPost.find()
         .then((result) => {
-            res.send(result);
+            res.json({ posts: result });
         })
         .catch((error) => {
             console.log(error);

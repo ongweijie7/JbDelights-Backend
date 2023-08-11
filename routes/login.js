@@ -111,7 +111,7 @@ router.get("/favourites",  authUser, async (req, res) => {
         posts.push(postDetails);
     }
 
-    return res.status(200).send(posts);
+    return res.status(200).json({ posts: posts });
 })
 
 /* Handle liking and unliking of posts */
