@@ -52,7 +52,7 @@ router.post("/create", (req, res) => {
     parsedBody.tag = "FOOD";
     submissions.create(parsedBody)
     .then(result => res.json({text: "successfully added!"}))
-    .catch(error => res.json({text: error}));
+    .catch(error => res.status(400));
 })
 
 module.exports = router;

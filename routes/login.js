@@ -6,8 +6,9 @@ const bcrypt = require('bcrypt');
 const fineDining = require("../model/fineDining");
 const adventures = require("../model/adventures");
 const foodPost = require("../model/foodPost");
+const { ValidationError } = require("../errors/Errors");
 
-
+/* Middleware functions */
 const authUser = (req, res, next) => {
     try {
         const token = req.headers.authorisation.split(" ")[1];  // Get token from header
@@ -16,7 +17,7 @@ const authUser = (req, res, next) => {
             decoded = jwt.verify(token, 'your-secret-key');
         } catch (error) {
             console.log(error);
-            return res.status(402).json({ message: "Authentication token has expired. Please log in again." });
+            return res.status(402).json({ error: "Authentication token has expired. Please log in again." });
         }
         req.user = decoded;
         next();
@@ -25,32 +26,58 @@ const authUser = (req, res, next) => {
     }
 }
 
+const validateRegistration = async (req, res, next) => {
+    const emailRegex = /^[A-z0-9]+@[A-z]+\.[A-z]{2,4}$/;
+    const passwordRegex = /^(?=.*[A-z])(?=.*\d)[A-z\d]{8,}$/;
+    const { email, password } = req.body;
+    try  {
+        if (!emailRegex.test(email)) {
+            console.log("400 Invalid email address provided");
+            throw new ValidationError("Please provide a valid email address", 400);
+        } else if (!passwordRegex.test(password)) {
+            console.log("400 Password provided does not follow the provided guidelines");
+            throw new ValidationError("Please provide an alphanumeric password with at least 8 characters", 400);
+        }
+    
+        const user = await users.findOne({ email });
+        if (user != null) {
+            console.log("409 There is currently another user associated with the provided email");
+            throw new ValidationError("The requested email is already in use", 409);
+        }
+    
+        next();
+    } catch (error) {
+        return res.status(error.statusCode).json({ error: error.message })
+    }
+    
+}   
+/* ************************ */
 
-router.post("/register", async (req, res) => { 
+router.post("/register", validateRegistration, async (req, res) => { 
     const { email, password } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-
-    users.create({ email, password : hashedPassword})
-    .then(result => res.status(201).json({ message: 'User registered successfully' }))
-    .catch(error => res.status(500).json({ error: error }));
+    users.create({ email, password: hashedPassword})
+    .then(() => res.status(201).json({ message: 'User registered successfully' }))
+    .catch(error => res.status(500).json({ error: "An unexpected error occurred with the server" }));
 })
 
-router.post("", (req, res) => { 
-    const findUser = async (req) => {
+router.post("", async (req, res) => {  
         try {
             const { email, password } = req.body;
             const user = await users.findOne({ email });
             
             if (user == null) {
-                return null;
+                console.log("404 User not found")
+                throw new ValidationError("User not found", 404);
             }
 
             const isValidPassword = await bcrypt.compare(password, user.password);
 
             if (!isValidPassword) {
-                return null;
+                console.log("Incorrect password")
+                throw new ValidationError("Incorrect password", 401);
             }
 
             const token = jwt.sign(
@@ -61,18 +88,16 @@ router.post("", (req, res) => {
             
             let favourites = Array.from(user.favourites, ([key, value]) => ({ key, value }));
             favourites = JSON.stringify(favourites);
-            return { token, favourites };
+            return res.status(200).json({ token, favourites });
 
         } catch (error) {
-            console.log(error.message);
+            if (error instanceof ValidationError) {
+                return res.status(error.statusCode).json({ error: error.message });
+            } else {
+                console.error(error);
+                return res.status(500).json({ error: "An unexpected error occurred with the server" });
+            }
         }
-    }
-
-    findUser(req).then(({ token, favourites }) => {
-        return token == null 
-        ? res.status(404).json({error: "Wrong"}) 
-        : res.status(200).json({token : token, favourites: favourites});
-    })
 })
 
 
