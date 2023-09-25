@@ -1,36 +1,46 @@
 const express = require('express');
 const submissions = require("../model/submissions");
+const JsonResponse = require('../common/jsonResponse');
 
 const getPosts = (req, res, model) => {
-    model.find()
-        .then((result) => {
-            return res.json({ posts: result });
-        })
-        .catch((error) => {
+    const fetchData = async (model) => {
+        try {
+            const data = await model.find();
+            return JsonResponse.success(200, data).send(res);
+        } catch (error) {
             console.log(error);
-            return res.status(500).send("Internal Server Error");
-        });
+            return JsonResponse.fail(500, error).send(res);
+        }
+    }
+    fetchData(model);
 } 
 
 const getPostDetails = (req, res, model) => {
     const fetchData = async (postId) => {
         try {
-            const postDetails = await model.findById(postId);
-            return postDetails;
+            const data = await model.findById(postId);
+            return JsonResponse.success(200, data).send(res);
         } catch (error) {
             console.log(error);
+            return JsonResponse.fail(500, error).send(res);
         }
     }
-    // TODO: standardise format of responses
-    fetchData(req.params.id).then(result => res.send(result)); 
+    fetchData(req.params.id);
 }
 
 const createSubmissions = (req, res, category) => {
+    const postData = async () => {
+        try {
+            await submissions.create(parsedBody);
+            return JsonResponse.success(200, "Submission successfully added!").send(res);
+        } catch (error) {
+            console.log(error);
+            return JsonResponse.fail(400, error).send(res);
+        }
+    }
     const parsedBody = req.body;
     parsedBody.tag = category;
-    submissions.create(parsedBody)
-    .then(result => res.json({text: "successfully added!"}))
-    .catch(error => res.status(400));
+    postData(parsedBody);
 }
 
 module.exports= { getPosts, getPostDetails, createSubmissions }

@@ -11,11 +11,8 @@ const submissionsSchema = new Schema({
         image2: { type: String },
     },
     details: { 
-         openingHours : { type: String, required: true },
+         openingHours : { type: String },
          introduction : { type: String, required: true },
-    },
-    hook: {
-        type: String,
     },
     address: {
         type: String,

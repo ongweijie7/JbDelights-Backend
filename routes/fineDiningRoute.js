@@ -1,40 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const fineDining = require("../model/fineDining");
-const submissions = require("../model/submissions");
+const controller = require("../controllers/Controller");
 
 router.get("", (req, res) => { 
-    //retrieve all food posts
-    fineDining.find()
-        .then((result) => {
-            res.json({ posts: result });
-        })
-        .catch((error) => {
-            console.log(error);
-            res.status(500).send("Internal Server Error");
-        })
+    controller.getPosts(req, res, fineDining);
 })
 
-//retrieve a particular food post
 router.get("/:id", (req, res) => {
-    const fetchData = async (id) => {
-        try {
-            const document = await fineDining.findById(id);
-            return document;
-        } catch (error) {
-            console.log(error);
-        }
-    }
-    fetchData(req.params.id).then(result => res.send(result));   
+    controller.getPostDetails(req, res, fineDining);  
 })
-
 
 router.post("/create", (req, res) => {
-    const parsedBody = req.body;
-    parsedBody.tag = "FINE_DINING";
-    submissions.create(parsedBody)
-    .then(result => res.json({text: "successfully added!"}))
-    .catch(error => res.json({text: error}));
+    controller.createSubmissions(req, res, "FINEDINING");
 })
 
 module.exports = router;

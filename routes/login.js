@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const JsonResponse = require('../common/jsonResponse');
 
 /* required for encryptions and token generation */
 const jwt = require('jsonwebtoken');
@@ -99,7 +100,7 @@ router.get("/favourites",  authUser, async (req, res) => {
         posts.push(postDetails);
     }
 
-    return res.status(200).json({ posts: posts });
+    return JsonResponse.success(200, posts).send(res);
 })
 
 /* Handle liking and unliking of posts */

@@ -19,7 +19,7 @@ var login = require('./routes/login');
 var localDelights = require('./routes/foodRoute');
 var fineDining = require('./routes/fineDiningRoute');
 var adventures = require('./routes/adventuresRoute');
-var admin = require('./adminRoute');
+var admin = require('./routes/adminRoute');
 
 app.use('/login', login);
 app.use('/admin', admin);

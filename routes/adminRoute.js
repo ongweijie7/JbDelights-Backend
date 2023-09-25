@@ -1,11 +1,15 @@
 var jwt = require('jsonwebtoken');
 const express = require("express");
 const router = express.Router();
-const submissions = require("./model/submissions");
-const fineDining = require("./model/fineDining");
-const adventures = require("./model/adventures");
-const foodPost = require("./model/foodPost");
+const JsonResponse = require('../common/jsonResponse');
 
+/* Modes */
+const submissions = require("../model/submissions");
+const fineDining = require("../model/fineDining");
+const adventures = require("../model/adventures");
+const foodPost = require("../model/foodPost");
+
+//TODO: Separate into controller and
 const authAdmin = (req, res, next) => {
     try {
         const token = req.headers.authorisation.split(" ")[1];  // Get token from header
@@ -27,25 +31,26 @@ const authAdmin = (req, res, next) => {
 
 router.get('/submissions', authAdmin, (req, res) => {
     submissions.find()
-        .then((result) => {
-            res.send(result);
+        .then((data) => {
+            return JsonResponse.success(200, data).send(res);
         })
         .catch((error) => {
             console.log(error);
-            res.status(500).send("Internal Server Error");
+            return JsonResponse.fail(500, error).send(res);
         })
 });
 
 router.get("/:id", (req, res) => {
     const fetchData = async (id) => {
         try {
-            const document = await submissions.findById(id);
-            return document;
+            const data = await submissions.findById(id);
+            return JsonResponse.success(200, data).send(res);
         } catch (error) {
             console.log(error);
+            return JsonResponse.fail(500, error).send(res);
         }
     }
-    fetchData(req.params.id).then(result => res.send(result));   
+    fetchData(req.params.id);
 })
 
 /* Adds submissions to the relevant collections or rejects them*/
@@ -75,9 +80,9 @@ router.delete('/:id', authAdmin, async (req, res) => {
     console.log(req.params.id);
     try {
         const removedUser = await submissions.findByIdAndRemove(req.params.id) ;
-        res.json(removedUser);
+        return res.json(removedUser);
     } catch (err) {
-    res.status(400).json({ message: err });
+        return res.status(400).json({ message: err });
     }
 });
 
