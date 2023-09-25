@@ -1,10 +1,10 @@
 var jwt = require('jsonwebtoken');
 const express = require("express");
 const router = express.Router();
-const submissions = require("../model/submissions");
-const fineDining = require("../model/fineDining");
-const adventures = require("../model/adventures");
-const foodPost = require("../model/foodPost");
+const submissions = require("./model/submissions");
+const fineDining = require("./model/fineDining");
+const adventures = require("./model/adventures");
+const foodPost = require("./model/foodPost");
 
 const authAdmin = (req, res, next) => {
     try {
