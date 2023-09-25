@@ -12,8 +12,8 @@ const adventures = require("../model/adventures");
 const foodPost = require("../model/foodPost");
 
 /* middleware functions */
-const authUser = require("../middleware/authorisationCheck");
-const validateRegistration = require("../middleware/registerCheck");
+const authUser = require("../middlewares/authorisationCheck");
+const validateRegistration = require("../middlewares/registerCheck");
 
 
 router.post("/register", validateRegistration, async (req, res) => { 

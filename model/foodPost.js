@@ -23,5 +23,6 @@ const foodSchema = new Schema({
     
 })
 
+/* creates document for the model DB */
 const FoodPosts = mongoose.model('FoodPosts', foodSchema);
 module.exports = FoodPosts;
