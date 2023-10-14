@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const JsonResponse = require('../common/jsonResponse');
+const { ValidationError } = require("../errors/Errors");
 
 /* required for encryptions and token generation */
 const jwt = require('jsonwebtoken');
